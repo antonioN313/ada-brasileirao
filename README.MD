@@ -163,15 +163,24 @@ java -jar build/libs/brasileirao-analytics-all.jar --data-dir data/ --report lea
 * **Use Cases**: classes que orquestram as análises (`MostWinsInYearUseCase`, `TopScorerUseCase`, `LeastPlaysByStateUseCase`).
 * **Infrastructure / Adapters**: leitura dos CSVs via NIO.2 (`Files.lines(Path)`), parsers robustos (validação e `Optional`), adaptadores de saída (JSON/CSV/Console) e implementação de repositórios.
 
+### Diagrama de Componentes
+![Componentes](docs/diagrams/Component_Diagram_Ada_Brasileirao.svg)
+
 ### Leitura de CSV
 
 * Usar `Files.lines(Path)` para trabalhar com `Stream<String>` e garantir processamento lazy.
 * Parser responsável por transformar cada linha em um DTO/entidade, retornando `Optional<T>` para lidar com linhas inválidas.
 * Uso de `Collectors` (`groupingBy`, `summingInt`, `toConcurrentMap`) para agregações eficientes.
 
+### Pipeline de Processamento CSV
+![Pipeline](docs/diagrams/PipeLine_Diagram_Ada_Brasileirao.svg)
+
 ### Programação Funcional & Optional
 
 * Uso intenso de `Stream`, `Collectors`, `Optional`, `Function`, `Predicate` e outras interfaces funcionais para manter código conciso e testável.
+
+### Diagrama de composição funcional
+![Fluxo MostWinsInYear](docs/diagrams/Flowchart_Most_Wins_Ada_Brasileirao.svg)
 
 ### Paralelismo & Assincronia
 
@@ -179,6 +188,8 @@ java -jar build/libs/brasileirao-analytics-all.jar --data-dir data/ --report lea
 * Ao usar paralelismo, preferir coletores concorrentes e estruturas thread-safe. Evitar mutações compartilhadas sem sincronização.
 
 ---
+### Diagrama de Sequencia Paralelismo
+![SequenciaParalelismo](docs/diagrams/Sequence_Diagram_Ada_Brasileirao.svg)
 
 ## Design das análises (exemplo conceitual)
 
@@ -205,6 +216,8 @@ try (Stream<String> lines = Files.lines(golsCsvPath)) {
 Para processamentos maiores é recomendável usar `collect(Collectors.toConcurrentMap(...))` quando `parallel()` estiver ativado.
 
 ---
+### Diagrama de tratamento de erro (parse com Optional)
+![ParseOptional](docs/diagrams/Flowchart_Parse_Optional_Ada_Brasileiro.svg)
 
 ## Testes
 
