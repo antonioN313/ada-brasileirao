@@ -1,4 +1,4 @@
-package com.ada.brasileirao.io;
+package com.ada.brasileirao.repository;
 
 import java.util.Map;
 import java.util.stream.Stream;

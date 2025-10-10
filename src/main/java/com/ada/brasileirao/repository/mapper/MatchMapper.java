@@ -1,23 +1,19 @@
-package com.ada.brasileirao.mapping;
+package com.ada.brasileirao.repository.mapper;
+
+import com.ada.brasileirao.model.Match;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
-public class MatchMapper implements CsvToDomaininMapper<Match> {
+public class MatchMapper implements CsvToDomainMapper<Match> {
     private static final LocalDate DEFAULT_DATE = LocalDate.of(1900, 1, 1);
 
     private final List<DateTimeFormatter> dateFormats;
 
     public MatchMapper() {
-        this(List.of(
-                DateTimeFormatter.ofPattern("d/M/uuuu"),
-                DateTimeFormatter.ISO_LOCAL_DATE
-        ));
+        this(List.of(DateTimeFormatter.ofPattern("d/M/uuuu"), DateTimeFormatter.ISO_LOCAL_DATE));
     }
 
     public MatchMapper(List<DateTimeFormatter> dateFormats) {
@@ -26,23 +22,21 @@ public class MatchMapper implements CsvToDomaininMapper<Match> {
 
     @Override
     public Optional<Match> map(Map<String, String> row) {
-        Objects.requireNonNull(row, "row");
+        Objects.requireNonNull(row);
 
-
-        Optional<String> homeOpt = firstNonBlank(row, "home", "mandante", "time_mandante").map(String::trim);
-        Optional<String> awayOpt = firstNonBlank(row, "away", "visitante", "time_visitante").map(String::trim);
+        Optional<String> homeOpt = firstNonBlank(row, "mandante", "home", "time_mandante");
+        Optional<String> awayOpt = firstNonBlank(row, "visitante", "away", "time_visitante");
 
         return homeOpt.flatMap(home ->
                 awayOpt.map(away -> {
-                    LocalDate date = firstNonBlank(row, "date", "data", "data_jogo", "dia")
+                    LocalDate date = firstNonBlank(row, "data", "date", "data_jogo")
                             .flatMap(this::parseDate)
                             .orElse(DEFAULT_DATE);
 
-                    int homeGoals = firstNonBlank(row, "home_goals", "gols_mandante", "mandante_gols", "placar_mandante")
+                    int homeGoals = firstNonBlank(row, "gols_mandante", "home_goals", "mandante_gols")
                             .flatMap(this::parseInt)
                             .orElse(0);
-
-                    int awayGoals = firstNonBlank(row, "away_goals", "gols_visitante", "visitante_gols", "placar_visitante")
+                    int awayGoals = firstNonBlank(row, "gols_visitante", "away_goals", "visitante_gols")
                             .flatMap(this::parseInt)
                             .orElse(0);
 
@@ -50,7 +44,7 @@ public class MatchMapper implements CsvToDomaininMapper<Match> {
                             .map(String::trim)
                             .orElse("UNKNOWN");
 
-                    return new Match(date, home, away, homeGoals, awayGoals, state);
+                    return new Match(date, home.trim(), away.trim(), homeGoals, awayGoals, state);
                 })
         );
     }
@@ -59,7 +53,9 @@ public class MatchMapper implements CsvToDomaininMapper<Match> {
         for (String k : keys) {
             if (row.containsKey(k)) {
                 String v = row.get(k);
-                if (v != null && !v.isBlank()) return Optional.of(v);
+                if (v != null && !v.isBlank()) {
+                    return Optional.of(v);
+                }
             }
         }
         return Optional.empty();
@@ -71,11 +67,8 @@ public class MatchMapper implements CsvToDomaininMapper<Match> {
         for (DateTimeFormatter fmt : dateFormats) {
             try {
                 return Optional.of(LocalDate.parse(s, fmt));
-            } catch (DateTimeParseException ignored) {
-
-            }
+            } catch (DateTimeParseException ignored) {}
         }
-
         try {
             return Optional.of(LocalDate.parse(s));
         } catch (DateTimeParseException e) {
