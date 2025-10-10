@@ -1,21 +1,22 @@
-package com.ada.brasileirao.io;
+package com.ada.brasileirao.repository;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 public class FileCsvReader implements CsvReader {
-
     private final CsvParser parser;
 
     public FileCsvReader(CsvParser parser) {
         this.parser = parser;
     }
 
+    @Override
     public Stream<Map<String, String>> readStream(Path path) {
         try {
             Stream<String> lines = Files.lines(path, StandardCharsets.UTF_8);
@@ -28,8 +29,9 @@ public class FileCsvReader implements CsvReader {
         }
     }
 
-    public java.util.List<Map<String,String>> readAll(Path path) {
-        try (Stream<Map<String,String>> s = readStream(path)) {
+    @Override
+    public List<Map<String, String>> readAll(Path path) {
+        try (Stream<Map<String, String>> s = readStream(path)) {
             return s.toList();
         }
     }

@@ -1,8 +1,8 @@
-package com.ada.brasileirao.mapping;
+package com.ada.brasileirao.repository.mapper;
 
 import java.util.Map;
 import java.util.Optional;
 
-public interface CsvToDomaininMapper<T> {
+public interface CsvToDomainMapper<T> {
     Optional<T> map(Map<String, String> row);
 }
