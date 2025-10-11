@@ -6,10 +6,19 @@ import com.ada.brasileirao.exporter.ReportExporter;
 import com.ada.brasileirao.model.Match;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class BrasileiraoApp {
     public static void main(String[] args) {
+        // Configura UTF-8 para o console
+        try {
+            System.setOut(new PrintStream(System.out, true, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            // Se falhar, continua com a codificação padrão
+        }
+        
         if (args.length < 1) {
             printUsage();
             System.exit(1);
