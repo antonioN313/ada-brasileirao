@@ -31,11 +31,15 @@ public class BrasileiraoController {
 
         Map<String, PlayerStats> stats = new HashMap<>();
         if (pathEvents != null) {
+            // Processar arquivo de eventos (pode conter gols E/OU cartões)
             List<Map<String, String>> rawEvents = csvReader.readAll(pathEvents);
             for (Map<String, String> row : rawEvents) {
                 processEventRow(row, stats);
             }
         }
+        
+        // Também tentar processar arquivos separados de gols e cartões
+        tryProcessGoalsAndCards(stats);
 
         StatisticsService service = new StatisticsService(matches, stats);
 
@@ -51,31 +55,69 @@ public class BrasileiraoController {
 
         return res;
     }
+    
+    private void tryProcessGoalsAndCards(Map<String, PlayerStats> stats) {
+        try {
+            // Processar gols
+            Path goalsPath = Path.of("data/campeonato-brasileiro-gols.csv");
+            if (java.nio.file.Files.exists(goalsPath)) {
+                List<Map<String, String>> goals = csvReader.readAll(goalsPath);
+                for (Map<String, String> row : goals) {
+                    processEventRow(row, stats);
+                }
+            }
+            
+            // Processar cartões
+            Path cardsPath = Path.of("data/campeonato-brasileiro-cartoes.csv");
+            if (java.nio.file.Files.exists(cardsPath)) {
+                List<Map<String, String>> cards = csvReader.readAll(cardsPath);
+                for (Map<String, String> row : cards) {
+                    processEventRow(row, stats);
+                }
+            }
+        } catch (Exception e) {
+            // Silenciosamente ignora se os arquivos não existirem
+        }
+    }
 
     private void processEventRow(Map<String, String> row, Map<String, PlayerStats> stats) {
-        String jogador = row.get("jogador");
+        // Tentar pegar o nome do jogador/atleta
+        String jogador = row.get("atleta");
+        if (jogador == null || jogador.isBlank()) {
+            jogador = row.get("jogador");
+        }
+        
         if (jogador == null || jogador.isBlank()) {
             return;
         }
         jogador = jogador.trim();
         PlayerStats ps = stats.computeIfAbsent(jogador, PlayerStats::new);
 
-        String goalTypeRaw = row.get("tipo_gol");
-        String cardTypeRaw = row.get("cartao");
-
-        GoalType gt = GoalType.fromString(goalTypeRaw);
-        switch (gt) {
-            case PENALTY -> ps.addPenaltyGoals(1);
-            case OWN_GOAL -> ps.addOwnGoals(1);
-            case NORMAL -> {}
+        // Processar gols
+        String goalTypeRaw = row.get("tipo_de_gol");
+        if (goalTypeRaw == null) {
+            goalTypeRaw = row.get("tipo_gol");
         }
-        ps.addGoals(1);
+        
+        if (goalTypeRaw != null && !goalTypeRaw.isBlank()) {
+            GoalType gt = GoalType.fromString(goalTypeRaw);
+            switch (gt) {
+                case PENALTY -> ps.addPenaltyGoals(1);
+                case OWN_GOAL -> ps.addOwnGoals(1);
+                case NORMAL -> {}
+            }
+            ps.addGoals(1);
+        }
 
-        CardType ct = CardType.fromString(cardTypeRaw);
-        if (ct == CardType.YELLOW) {
-            ps.addYellowCards(1);
-        } else if (ct == CardType.RED) {
-            ps.addRedCards(1);
+        // Processar cartões
+        String cardTypeRaw = row.get("cartao");
+        if (cardTypeRaw != null && !cardTypeRaw.isBlank()) {
+            CardType ct = CardType.fromString(cardTypeRaw);
+            if (ct == CardType.YELLOW) {
+                ps.addYellowCards(1);
+            } else if (ct == CardType.RED) {
+                ps.addRedCards(1);
+            }
         }
     }
 

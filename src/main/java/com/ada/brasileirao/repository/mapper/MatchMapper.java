@@ -33,14 +33,14 @@ public class MatchMapper implements CsvToDomainMapper<Match> {
                             .flatMap(this::parseDate)
                             .orElse(DEFAULT_DATE);
 
-                    int homeGoals = firstNonBlank(row, "gols_mandante", "home_goals", "mandante_gols")
+                    int homeGoals = firstNonBlank(row, "mandante_Placar", "gols_mandante", "home_goals", "mandante_gols")
                             .flatMap(this::parseInt)
                             .orElse(0);
-                    int awayGoals = firstNonBlank(row, "gols_visitante", "away_goals", "visitante_gols")
+                    int awayGoals = firstNonBlank(row, "visitante_Placar", "gols_visitante", "away_goals", "visitante_gols")
                             .flatMap(this::parseInt)
                             .orElse(0);
 
-                    String state = firstNonBlank(row, "estado", "uf", "estadio_estado")
+                    String state = firstNonBlank(row, "mandante_Estado", "estado", "uf", "estadio_estado")
                             .map(String::trim)
                             .orElse("UNKNOWN");
 

@@ -1,0 +1,20 @@
+{
+  "estatisticas": {
+    "time_mais_vitorias_2008": "Gremio",
+    "estado_menos_jogos": "AL",
+    "jogador_mais_gols": "Fábio Santos",
+    "jogador_mais_penaltis": "Fábio Santos",
+    "jogador_mais_gols_contra": "Werley Ananias da Silva",
+    "jogador_mais_cartoes_amarelos": "Thiago Heleno",
+    "jogador_mais_cartoes_vermelhos": "David Braz",
+    "partida_mais_gols": {
+      "data": "2003-10-22",
+      "mandante": "Bahia",
+      "visitante": "Santos",
+      "gols_mandante": 4,
+      "gols_visitante": 7,
+      "total_gols": 11,
+      "estado": "BA"
+    }
+  }
+}
