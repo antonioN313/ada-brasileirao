@@ -6,7 +6,6 @@ import com.ada.brasileirao.model.GoalType;
 import com.ada.brasileirao.model.CardType;
 import com.ada.brasileirao.repository.CsvReader;
 import com.ada.brasileirao.repository.FileCsvReader;
-import com.ada.brasileirao.repository.CsvParser;
 import com.ada.brasileirao.repository.CsvParserImp;
 import com.ada.brasileirao.repository.mapper.CsvToDomainMapper;
 import com.ada.brasileirao.repository.mapper.MatchMapper;
